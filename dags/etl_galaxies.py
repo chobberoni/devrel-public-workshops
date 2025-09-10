@@ -33,13 +33,13 @@ _CLOSENESS_THRESHOLD_LY_PARAMETER_NAME = "closeness_threshold_light_years"
 
 @dag(
     start_date=datetime(2025, 4, 1),
-    schedule=@daily,
+    schedule_interval='@daily',  # Runs daily at midnight
     max_consecutive_failed_dag_runs=5,
     max_active_runs=1,
     doc_md=__doc__,
     default_args={
         "owner": "Astro",
-        "retries": 1,
+        "retries": 3,
         "retry_delay": duration(seconds=30),
     },
     tags=["example", "ETL"],
@@ -185,7 +185,7 @@ def etl_galaxies():
     load_galaxy_data_obj = load_galaxy_data(transform_galaxy_data_obj)
 
     chain(
-        create_galaxy_table_in_duckdb_obj, transform_galaxy_data_obj, load_galaxy_data_obj, print_loaded_galaxies()
+        transform_galaxy_data_obj, create_galaxy_table_in_duckdb_obj, load_galaxy_data_obj, print_loaded_galaxies()
     )
 
 etl_galaxies()
